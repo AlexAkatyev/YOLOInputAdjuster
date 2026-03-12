@@ -93,16 +93,16 @@ def correctLine(stroka):
     result = strarray[0] + ' '
     # x
     number = float(strarray[1]) * currentW / inputWindowSize
-    result += str(number) + ' '
+    result += "{:.6f}".format(number) + ' '
     # y
     number = float(strarray[2]) * currentH / inputWindowSize
-    result += str(number) + ' '
+    result += "{:.6f}".format(number) + ' '
     # width
     number = float(strarray[3]) * currentW / inputWindowSize
-    result += str(number) + ' '
+    result += "{:.6f}".format(number) + ' '
     # height
     number = float(strarray[4]) * currentH / inputWindowSize
-    result += str(number)
+    result += "{:.6f}".format(number)
     return result + '\n'
 
 
