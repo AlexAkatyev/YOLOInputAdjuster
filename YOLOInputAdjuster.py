@@ -129,7 +129,7 @@ def run():
     i = 0
     print('Progress:')
     for imgName in markedImages:
-        print(f"\r{i / count * 100} %", end='')
+        print(f"\r{i / count * 100:.2f} %   ", end='')
         correctImage(imgName)
         correctMarkedText(imgName)
         i = i + 1
