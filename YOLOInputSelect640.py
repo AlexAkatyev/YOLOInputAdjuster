@@ -52,10 +52,61 @@ def resultDirPathInput():
     resultDir = dirPathInput(defPath=resultDir, preamble='input result directory ')
 
 
+def readMarkedline(stroka, w, h):
+    result = []
+    strarray = stroka.split()
+    if len(strarray) < 5:
+        return result
+    # tag index 0
+    centerx = round(float(strarray[1]) * w)
+    centery = round(float(strarray[2]) * h)
+    # width
+    dwidth = round(float(strarray[3]) * w / 2)
+    # height
+    dheight = round(float(strarray[4]) * h / 2)
+    result.append(centerx - dwidth)  # xl
+    result.append(centery - dheight)  # yt
+    result.append(centerx + dwidth)  # xr
+    result.append(centery + dheight)  # yb
+    return result
+
+
 # tuples list
 # tuple: (xleft, ytop, xright, ybottom)
-def getCoordinates(imgname, merkedname):
-    return [(100, 100, 740, 740), (200, 200, 840, 840)]
+def getCoordinates(imgname, markedname):
+    global sourceDir
+    global windowSize
+    result = []
+    img = Image.open(sourceDir + '/' + imgname)
+    imgh = img.height
+    imgw = img.width
+    img.close()
+    sourceMark = []
+    fileName = os.path.join(sourceDir, markedname)
+    if os.path.isfile(fileName):
+        with open(fileName, 'r') as filer:
+            liststr = filer.readlines()
+            for i in range(len(liststr)):
+                sourceMark.append(readMarkedline(liststr[i], imgw, imgh))
+    xl = imgw
+    xr = 0
+    yt = imgh
+    yb = 0
+    for mark in sourceMark:
+        if xl > mark[0]:
+            xl = mark[0]
+        if xr < mark[2]:
+            xr = mark[2]
+        if yt > mark[1]:
+            yt = mark[1]
+        if yb < mark[3]:
+            yb = mark[3]
+
+    x = (xl + xr) / 2
+    y = (yt + yb) / 2
+    ws = windowSize / 2
+    result.append((x - ws, imgh / 2 - ws, x + ws, imgh / 2 + ws))
+    return result
 
 
 def correctFileName(fname, index):
@@ -82,9 +133,11 @@ def run():
     i = 0
     print('Progress:')
     for markedName in markedFiles:
+        if markedName.find('classes.txt') != -1:
+            continue
         print(f"\r{i / count * 100:.2f} %   ", end='')
         imgName = markedName.lower().replace('.txt', '.png', -1)
-        coordinatesList = getCoordinates(imgname=imgName, merkedname=markedName)
+        coordinatesList = getCoordinates(imgname=imgName, markedname=markedName)
         j = 1
         for positions in coordinatesList:
             selectImage(imgname=imgName, coordinates=positions, iter=j)
