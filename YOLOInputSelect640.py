@@ -130,13 +130,23 @@ def getCoordinates(imgname, markedname):
             yt = mark[2]
         if yb < mark[4]:
             yb = mark[4]
-
-    x = (xl + xr) / 2
-    y = (yt + yb) / 2
-    ws = windowSize / 2
-    result.append((x - ws, imgh / 2 - ws, x + ws, imgh / 2 + ws))
-    if margin != 0:
-        result.append((x - ws, imgh / 2 - ws + margin, x + ws, imgh / 2 + ws + margin))
+    hs = windowSize / 2
+    listcx = []
+    if xr - xl > windowSize:
+        center = xl + hs
+        listcx.append(center)
+        while center + hs < xr:
+            center += 1.5 * hs
+            if center + hs > xr:
+                center = xr - hs
+            listcx.append(center)
+    else:
+        c0 = (xl + xr) / 2
+        listcx.append(c0)
+    for cx in listcx:
+        result.append((cx - hs, imgh / 2 - hs, cx + hs, imgh / 2 + hs))
+        if margin != 0:
+            result.append((cx - hs, imgh / 2 - hs + margin, cx + hs, imgh / 2 + hs + margin))
     return result, imgw, imgh
 
 
