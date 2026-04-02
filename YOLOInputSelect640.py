@@ -134,7 +134,7 @@ def selectImage(imgname, coordinates, iter):
     cropped.save(resultDir + '/' + correctFileName(imgname, iter))
 
 
-def createLine(stroka, coord, w, h):
+def createLine(stroka, coord):
     global windowSize
     # check
     xl = stroka[1]
@@ -149,6 +149,14 @@ def createLine(stroka, coord, w, h):
         return ''
     if yb <= coord[1]:
         return ''
+    if xl < coord[0]:
+        xl = coord[0]
+    if yt < coord[1]:
+        yt = coord[1]
+    if xr > coord[2]:
+        xr = coord[2]
+    if yb > coord[3]:
+        yb = coord[3]
     width = (xr - xl) / windowSize
     height = (yb - yt) / windowSize
     cx = (xl - coord[0]) / windowSize + width / 2
@@ -171,7 +179,7 @@ def createMarkToInput(markedname, coordinates, imgw, imgh, iter):
     sourceMark = readmarkedFile(markedname, imgw, imgh)
     mark = ''
     for stroka in sourceMark:
-        mark += createLine(stroka, coordinates, imgw, imgh)
+        mark += createLine(stroka, coordinates)
     with open(correctFileName(resultDir + '/' + markedname, iter), "w", encoding="utf-8") as filew:
         filew.write(mark)
 
