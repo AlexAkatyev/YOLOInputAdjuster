@@ -53,7 +53,7 @@ def resultDirPathInput():
     resultDir = dirPathInput(defPath=resultDir, preamble='input result directory ')
 
 
-# out: list(tag, f1, f2, f3, f4)
+# out: list(tag, xl, yt, xr, yb)
 def readMarkedline(stroka, w, h):
     result = []
     strarray = stroka.split()
@@ -74,6 +74,7 @@ def readMarkedline(stroka, w, h):
     return result
 
 
+# out: list list( tag, xl, yt, xr, yb)
 def readmarkedFile(markedname, w, h):
     global sourceDir
     sourceMark = []
@@ -133,8 +134,46 @@ def selectImage(imgname, coordinates, iter):
     cropped.save(resultDir + '/' + correctFileName(imgname, iter))
 
 
+def createLine(stroka, coord, w, h):
+    global windowSize
+    # check
+    xl = stroka[1]
+    yt = stroka[2]
+    xr = stroka[3]
+    yb = stroka[4]
+    if xl >= coord[2]:
+        return ''
+    if yt >= coord[3]:
+        return ''
+    if xr <= coord[0]:
+        return ''
+    if yb <= coord[1]:
+        return ''
+    width = (xr - xl) / windowSize
+    height = (yb - yt) / windowSize
+    cx = (xl - coord[0]) / windowSize + width / 2
+    cy = (yt - coord[1]) / windowSize + height / 2
+    # tag
+    result = str(stroka[0]) + ' '
+    # cx
+    result += "{:.6f}".format(cx) + ' '
+    # cy
+    result += "{:.6f}".format(cy) + ' '
+    # width
+    result += "{:.6f}".format(width) + ' '
+    # height
+    result += "{:.6f}".format(height)
+    return result + '\n'
+
+
 def createMarkToInput(markedname, coordinates, imgw, imgh, iter):
+    global resultDir
     sourceMark = readmarkedFile(markedname, imgw, imgh)
+    mark = ''
+    for stroka in sourceMark:
+        mark += createLine(stroka, coordinates, imgw, imgh)
+    with open(correctFileName(resultDir + '/' + markedname, iter), "w", encoding="utf-8") as filew:
+        filew.write(mark)
 
 
 def run():
