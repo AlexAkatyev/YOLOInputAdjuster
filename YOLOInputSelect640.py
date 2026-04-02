@@ -8,6 +8,7 @@ windowSize = 640
 margin = 0
 sourceDir = 'd:/3'
 resultDir = 'd:/4'
+minSize = 10
 
 # gui color
 startRed = '\033[31m'
@@ -167,6 +168,7 @@ def selectImage(imgname, coordinates, iter):
 
 def createLine(stroka, coord):
     global windowSize
+    global minSize
     # check
     xl = stroka[1]
     yt = stroka[2]
@@ -188,6 +190,8 @@ def createLine(stroka, coord):
         xr = coord[2]
     if yb > coord[3]:
         yb = coord[3]
+    if (xr - xl) < minSize or (yb - yt) < minSize:
+        return ''
     width = (xr - xl) / windowSize
     height = (yb - yt) / windowSize
     cx = (xl - coord[0]) / windowSize + width / 2
