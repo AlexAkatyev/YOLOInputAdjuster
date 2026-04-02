@@ -5,7 +5,7 @@ import shutil
 
 # global parameters
 windowSize = 640
-margin = 5
+margin = 0
 sourceDir = 'd:/3'
 resultDir = 'd:/4'
 
@@ -18,6 +18,24 @@ endColor = '\033[0m'
 
 def separatorPrint():
     print(startYellow + '----------------------------------------------------------------' + endColor)
+
+
+def yMarginInput():
+    global margin
+    separatorPrint()
+    correct = False
+    while not correct:
+        print(f"input window size (by default {margin}) : ", end=' ')
+        input_str = input()
+        if input_str != '':
+            if input_str.isdigit():
+                margin = int(input_str)
+                correct = True
+            else:
+                print(startRed + 'input data not correct' + endColor)
+        else:
+            correct = True
+    print('----- set window size ' + startGreen + f"{margin}" + endColor)
 
 
 def dirPathInput(defPath, preamble):
@@ -92,6 +110,7 @@ def readmarkedFile(markedname, w, h):
 def getCoordinates(imgname, markedname):
     global sourceDir
     global windowSize
+    global margin
     result = []
     img = Image.open(sourceDir + '/' + imgname)
     imgh = img.height
@@ -116,6 +135,8 @@ def getCoordinates(imgname, markedname):
     y = (yt + yb) / 2
     ws = windowSize / 2
     result.append((x - ws, imgh / 2 - ws, x + ws, imgh / 2 + ws))
+    if margin != 0:
+        result.append((x - ws, imgh / 2 - ws + margin, x + ws, imgh / 2 + ws + margin))
     return result, imgw, imgh
 
 
@@ -212,6 +233,7 @@ def run():
 # MAIN BEGIN --------------------------------------------------------------
 sourceDirPathInput()
 resultDirPathInput()
+yMarginInput()
 run()
 separatorPrint()
 print('press enter to exit')
