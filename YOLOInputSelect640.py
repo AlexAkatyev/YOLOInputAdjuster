@@ -6,8 +6,8 @@ import shutil
 # global parameters
 windowSize = 640
 margin = 0
-sourceDir = 'd:/3'
-resultDir = 'd:/4'
+sourceDir = '.'
+resultDir = 'inputs'
 minSize = 10
 
 # gui color
