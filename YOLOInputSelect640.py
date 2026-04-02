@@ -26,7 +26,7 @@ def yMarginInput():
     separatorPrint()
     correct = False
     while not correct:
-        print(f"input window size (by default {margin}) : ", end=' ')
+        print(f"input y margin (by default {margin}) : ", end=' ')
         input_str = input()
         if input_str != '':
             if input_str.isdigit():
@@ -36,7 +36,7 @@ def yMarginInput():
                 print(startRed + 'input data not correct' + endColor)
         else:
             correct = True
-    print('----- set window size ' + startGreen + f"{margin}" + endColor)
+    print('----- set y margin ' + startGreen + f"{margin}" + endColor)
 
 
 def dirPathInput(defPath, preamble):
