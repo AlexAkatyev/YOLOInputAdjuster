@@ -1,6 +1,7 @@
 # Select the area with the 640 size marks on the large image
 from PIL import Image
 import os
+import shutil
 
 # global parameters
 windowSize = 640
@@ -52,12 +53,14 @@ def resultDirPathInput():
     resultDir = dirPathInput(defPath=resultDir, preamble='input result directory ')
 
 
+# out: list(tag, f1, f2, f3, f4)
 def readMarkedline(stroka, w, h):
     result = []
     strarray = stroka.split()
     if len(strarray) < 5:
         return result
     # tag index 0
+    result.append(int(strarray[0]))
     centerx = round(float(strarray[1]) * w)
     centery = round(float(strarray[2]) * h)
     # width
@@ -71,7 +74,19 @@ def readMarkedline(stroka, w, h):
     return result
 
 
-# tuples list
+def readmarkedFile(markedname, w, h):
+    global sourceDir
+    sourceMark = []
+    fileName = os.path.join(sourceDir, markedname)
+    if os.path.isfile(fileName):
+        with open(fileName, 'r') as filer:
+            liststr = filer.readlines()
+            for i in range(len(liststr)):
+                sourceMark.append(readMarkedline(liststr[i], w, h))
+    return sourceMark
+
+
+# (tuples list, imgw, imgh)
 # tuple: (xleft, ytop, xright, ybottom)
 def getCoordinates(imgname, markedname):
     global sourceDir
@@ -81,32 +96,26 @@ def getCoordinates(imgname, markedname):
     imgh = img.height
     imgw = img.width
     img.close()
-    sourceMark = []
-    fileName = os.path.join(sourceDir, markedname)
-    if os.path.isfile(fileName):
-        with open(fileName, 'r') as filer:
-            liststr = filer.readlines()
-            for i in range(len(liststr)):
-                sourceMark.append(readMarkedline(liststr[i], imgw, imgh))
+    sourceMark = readmarkedFile(markedname, imgw, imgh)
     xl = imgw
     xr = 0
     yt = imgh
     yb = 0
     for mark in sourceMark:
-        if xl > mark[0]:
-            xl = mark[0]
-        if xr < mark[2]:
-            xr = mark[2]
-        if yt > mark[1]:
-            yt = mark[1]
-        if yb < mark[3]:
-            yb = mark[3]
+        if xl > mark[1]:
+            xl = mark[1]
+        if xr < mark[3]:
+            xr = mark[3]
+        if yt > mark[2]:
+            yt = mark[2]
+        if yb < mark[4]:
+            yb = mark[4]
 
     x = (xl + xr) / 2
     y = (yt + yb) / 2
     ws = windowSize / 2
     result.append((x - ws, imgh / 2 - ws, x + ws, imgh / 2 + ws))
-    return result
+    return result, imgw, imgh
 
 
 def correctFileName(fname, index):
@@ -124,8 +133,13 @@ def selectImage(imgname, coordinates, iter):
     cropped.save(resultDir + '/' + correctFileName(imgname, iter))
 
 
+def createMarkToInput(markedname, coordinates, imgw, imgh, iter):
+    sourceMark = readmarkedFile(markedname, imgw, imgh)
+
+
 def run():
     global sourceDir
+    global resultDir
     separatorPrint()
     markedFiles = [f for f in os.listdir(sourceDir) if
                    (os.path.isfile(os.path.join(sourceDir, f)) and f.lower().endswith('.txt'))]
@@ -134,13 +148,15 @@ def run():
     print('Progress:')
     for markedName in markedFiles:
         if markedName.find('classes.txt') != -1:
+            shutil.copy(sourceDir + '/' + markedName, resultDir + '/' + markedName)
             continue
         print(f"\r{i / count * 100:.2f} %   ", end='')
         imgName = markedName.lower().replace('.txt', '.png', -1)
-        coordinatesList = getCoordinates(imgname=imgName, markedname=markedName)
+        (coordinatesList, iw, ih) = getCoordinates(imgname=imgName, markedname=markedName)
         j = 1
         for positions in coordinatesList:
             selectImage(imgname=imgName, coordinates=positions, iter=j)
+            createMarkToInput(markedname=markedName, coordinates=positions, imgw=iw, imgh=ih, iter=j)
             j = j + 1
         i = i + 1
     print('\r' + startGreen + 'End of work' + endColor)
