@@ -48,5 +48,5 @@ sourceDirPathInput()
 autosplit(
     path=sourceDir,
     weights=(0.8, 0.2, 0.0),  # (train, validation, test) fractional splits
-    annotated_only=True,  # split only images with annotation file when True
+    annotated_only=False,  # split only images with annotation file when True
 )
